@@ -4,6 +4,7 @@ MSU Registration Helper — Browser Controller
 """
 
 import os
+import re
 import time
 from datetime import datetime
 from typing import Optional
@@ -34,6 +35,9 @@ class BrowserController:
         """
         if self.is_open:
             return self.page
+
+        if os.path.isdir(config.BUNDLED_PLAYWRIGHT_BROWSERS_DIR):
+            os.environ["PLAYWRIGHT_BROWSERS_PATH"] = config.BUNDLED_PLAYWRIGHT_BROWSERS_DIR
 
         self.playwright = sync_playwright().start()
         
@@ -101,6 +105,50 @@ class BrowserController:
             # สำหรับเว็บจริง (เช็คว่าไม่มีปุ่ม/ช่อง login หรือมีคำว่า logout)
             content = self.get_page_content().lower()
             return "logout" in content or "ออกจากระบบ" in content
+
+    def get_student_id(self) -> str:
+        """Return only the logged-in student ID, without name or other profile text."""
+        if not self.is_open:
+            return ""
+
+        try:
+            if config.MODE == "demo":
+                value = self.page.evaluate("sessionStorage.getItem('msu_username') || ''")
+                return self._extract_student_id(str(value or ""))
+
+            candidates: list[str] = []
+            username_locator = self.page.locator(config.SELECTORS["username"]).first
+            if username_locator.count() > 0:
+                try:
+                    candidates.append(username_locator.input_value(timeout=1000))
+                except Error:
+                    pass
+
+            for selector in [
+                "#student-id-display",
+                ".student-id",
+                "text=/รหัส(นิสิต|นักศึกษา)/",
+                "body",
+            ]:
+                try:
+                    locator = self.page.locator(selector).first
+                    if locator.count() > 0:
+                        candidates.append(locator.inner_text(timeout=1500))
+                except Error:
+                    pass
+
+            for text in candidates:
+                student_id = self._extract_student_id(text)
+                if student_id:
+                    return student_id
+        except Error:
+            return ""
+        return ""
+
+    @staticmethod
+    def _extract_student_id(text: str) -> str:
+        match = re.search(r"\b\d{8,13}\b", text or "")
+        return match.group(0) if match else ""
 
     def detect_waiting_room(self) -> bool:
         """

@@ -1,125 +1,174 @@
-# 🎓 MSU Registration Helper
+# MSU Registration Helper
 
-เครื่องมือ Desktop (GUI) สวยงามสำหรับช่วยกรอกและลงทะเบียนเรียน มหาวิทยาลัยมหาสารคาม (MSU) โดยใช้บราวเซอร์อัตโนมัติ (Browser Automation) แบบปลอดภัย เหมาะสำหรับใช้งานส่วนตัวหรือเป็นผลงาน Portfolio
+Desktop GUI helper for preparing and running Mahasarakham University course registration through a controlled browser session. Users log in manually in the browser; the app does not store passwords.
 
----
+## Key Features
 
-## ✨ คุณสมบัติหลัก (Key Features)
+- PyQt6 desktop GUI
+- Playwright-powered browser automation
+- Manual login only; no password storage
+- Waiting-room/session checks
+- Current registration queue
+- Saved Course Profiles for preparing course lists before registration day
+- Per-course result history in SQLite
+- CSV export/import for saved profiles
+- CSV export for registration result history
+- Retry settings with a default non-spam delay of 5-10 seconds
 
-- **Dark Theme สวยงาม**: ปรับแต่งหน้าต่าง GUI สไตล์ดาร์กโหมดหรูหราด้วย QSS (Qt Style Sheet)
-- **ปลอดภัย 100%**: โปรแกรมไม่เก็บและไม่ยุ่งเกี่ยวกับรหัสผ่านของผู้ใช้ ผู้ใช้เข้าสู่ระบบด้วยตัวเองผ่านเบราว์เซอร์
-- **เฝ้าระวังคิว (Waiting Room Detector)**: ตรวจจับหน้าคิว Cloudflare หรือระบบต่อคิวของมหาวิทยาลัยโดยอัตโนมัติ เมื่อพ้นคิวแล้วจะเข้าทำรายการทันทีโดยไม่ต้องเฝ้าหน้าจอ
-- **การป้อนข้อมูลรวดเร็ว**: กรอกรหัสวิชาและหมู่เรียนพร้อมสุ่มตรวจสอบความว่าง/ชนเวลา ทันทีเมื่อเข้าเว็บได้
-- **Session Keep-Alive**: ป้องกัน Session หลุดระหว่างการรอเปิดลงทะเบียนด้วยการขยับการเคลื่อนไหวเบาๆ
-- **ระบบคิวล่วงหน้า (Course Queue)**: เตรียมรายวิชาที่จะลงทะเบียนล่วงหน้าได้ไม่จำกัดและกดเพิ่มได้ในคีย์เดียว (One-key submit / Enter)
-- **ระบบจัดเก็บประวัติ**: บันทึกข้อมูลและผลลัพธ์ลงบน SQLite อัตโนมัติ พร้อมฟังก์ชันส่งออกผลลัพธ์เป็นไฟล์ CSV
+## Project Structure
 
----
-
-## 🛠️ Tech Stack & โครงสร้างโปรเจ็กต์
-
-- **Python 3.10+**
-- **PyQt6**: สำหรับพัฒนาส่วนหน้าจอ Desktop GUI
-- **Playwright (Python Sync API)**: ควบคุมเบราว์เซอร์ Chromium ประสิทธิภาพสูงสำหรับการทำ Automation
-- **SQLite**: เก็บรายการจัดเตรียมวิชาและประวัติการลงทะเบียน
-- **HTML/CSS/JS (Python Built-in Server)**: หน้าเว็บลงทะเบียนและระบบประมวลผลจำลอง สำหรับทดสอบ Playwright แบบปลอดภัย
-
-```
+```text
 msureghelpper/
-├─ main.py                 # ไฟล์เปิดโปรแกรมหลัก
-├─ config.py               # จุดศูนย์รวมตั้งค่า selectors, urls, settings
-├─ requirements.txt        # รายการไลบรารีที่จำเป็น
-├─ automation/
-│  ├─ browser.py           # ควบคุม Browser (BrowserController)
-│  └─ register.py          # ควบคุมการทำงานหน้าลงทะเบียน (RegistrationService)
-├─ database/
-│  └─ db.py                # จัดการ SQLite (DatabaseManager)
-├─ gui/
-│  ├─ app.py               # หน้าต่างหลัก MainWindow & Worker Thread
-│  ├─ styles.py            # สไตล์ชีต QSS สไตล์ Dark
-│  └─ widgets.py           # Custom Widgets (Table, Logs, Status Badge)
-├─ models/
-│  └─ course.py            # โมเดลข้อมูลรายวิชา (Course)
-└─ demo_server/            # เว็บทะเบียนจำลองสำหรับทดสอบระบบ
-   ├─ server.py            # สตาร์ท HTTP Server (Port 8899)
-   ├─ index.html           # หน้าจำลอง Login
-   ├─ dashboard.html       # หน้าหลักจำลอง
-   ├─ register.html        # หน้าทำรายการลงทะเบียนเรียนจำลอง
-   └─ result.html          # หน้าสรุปผลลัพธ์ลงทะเบียนจำลอง
+|-- main.py
+|-- config.py
+|-- requirements.txt
+|-- automation/
+|   |-- browser.py
+|   `-- register.py
+|-- database/
+|   `-- db.py
+|-- gui/
+|   |-- app.py
+|   |-- styles.py
+|   `-- widgets.py
+|-- models/
+|   `-- course.py
+`-- demo_server/
+    |-- server.py
+    |-- index.html
+    |-- dashboard.html
+    |-- register.html
+    `-- result.html
 ```
 
----
-
-## 🚀 วิธีการติดตั้งและรันโปรแกรมเพื่อทดสอบ
-
-### 1. ติดตั้ง Library และ Driver เบราว์เซอร์
-
-ให้รันคำสั่งเหล่านี้ใน Terminal หรือ PowerShell เพื่อเตรียมสภาพแวดล้อม:
+## Setup
 
 ```bash
-# ติดตั้ง PyQt6 และ Playwright
 pip install -r requirements.txt
-
-# ดาวน์โหลดบราวเซอร์ Chromium สำหรับ Playwright
 playwright install chromium
 ```
 
-### 2. รันหน้าเว็บลงทะเบียนจำลอง (Demo Server)
-
-เรามีโฟลเดอร์ `demo_server` เพื่อจำลองการล็อกอินและการลงทะเบียนเรียน ให้ทำการรัน Server จำลองขึ้นมาในอีกหน้าต่างหนึ่งก่อน:
+For demo testing, set `MODE = "demo"` in `config.py`, then run:
 
 ```bash
 python demo_server/server.py
+python main.py
 ```
-*ระบบจะเปิดเซิร์ฟเวอร์ไว้ที่ http://localhost:8899*
 
-### 3. รันโปรแกรมหลัก (MSU Registration Helper)
-
-เปิดหน้าต่างโปรแกรม GUI เพื่อเริ่มต้นใช้งาน:
+For production use, set `MODE = "production"` in `config.py`, then run:
 
 ```bash
 python main.py
 ```
 
----
+## Build For Distribution
 
-## 📖 คู่มือขั้นตอนการใช้งานทั่วไป
+Use this when you want to upload an installer to Google Drive or another download host.
 
-1. **เปิดบราวเซอร์**: กดปุ่ม **🌐 เปิด Browser** บนโปรแกรมหลัก เพื่อสั่งการเปิดเบราว์เซอร์จำลองขึ้นมาโดยอัตโนมัติ
-2. **เข้าสู่ระบบ**: ทำการเข้าสู่ระบบผ่านเว็บบราวเซอร์ที่เพิ่งเปิดขึ้นมาด้วยตนเอง (สำหรับเว็บจำลอง สามารถกรอกรหัสใดๆ ก็ได้)
-3. **ตรวจสอบสิทธิ์**: เมื่อล็อกอินในบราวเซอร์สำเร็จแล้ว ให้กลับมาที่หน้าต่างโปรแกรมและกด **✅ เช็ค Login** สถานะโปรแกรมจะเปลี่ยนเป็นสีเขียวระบุความพร้อมทำงาน
-4. **เตรียมวิชา**: กรอกรหัสวิชาและหมู่เรียน (Sec) แล้วกดปุ่มเพิ่มลงรายการล่วงหน้า (สามารถกดปุ่ม `Enter` แทนการคลิกได้)
-   - หากผู้ใช้ล็อกอินค้างไว้อยู่แล้ว ระบบจะส่งให้ Playwright ช่วยกรอกลงตารางบนหน้าเว็บโดยอัตโนมัติทันทีทีละวิชา
-5. **บันทึกยืนยัน**: เมื่อเลือกวิชาทั้งหมดพร้อมแล้ว กดปุ่ม **✔️ ยืนยันการลงทะเบียนเรียนทั้งหมด** เพื่อทำขั้นตอนการตัดยอดสรุปและบันทึกประวัติการลงทะเบียนเก็บไว้ในฐานข้อมูล
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\build_release.ps1 -Version 1.0.0
+```
 
----
+The build creates:
 
-## ⚠️ ข้อแนะนำด้านความปลอดภัยและการใช้งาน
+- `release/MSU-Registration-Helper-Setup-1.0.0.exe` - installer for normal users
+- `release/MSU-Registration-Helper-1.0.0-portable.zip` - portable folder build
 
-1. **ไม่เก็บรหัสผ่าน**: โปรแกรมนี้ไม่ได้ใช้ฟังก์ชันการกรอกรหัสผ่านด้วยระบบอัตโนมัติ ผู้ใช้ต้องลงชื่อเข้าใช้ด้วยตัวเองผ่านหน้าต่าง Browser จริงของ Playwright ซึ่งทำงานแยกตัวกัน ดังนั้นข้อมูลสำคัญของคุณจะไม่รั่วไหลแน่นอน
-2. **หลีกเลี่ยงการล็อกโดนบล็อก**: โปรแกรมมี Retry Logic ตั้งการรอนาน 5-10 วินาทีต่อครั้งระหว่างการเชื่อมต่อใหม่ หลีกเลี่ยงพฤติกรรมการเรียกถี่เกินไป (Spam Request) ซึ่งอาจก่อให้เกิดปัญหาทำให้ Cloudflare มองว่าเป็น Bot หรือรบกวนระบบมหาวิทยาลัย
+The installer bundles:
 
----
+- Python runtime
+- PyQt6
+- Playwright Python package
+- Playwright Chromium browser runtime
 
-## ⚙️ วิธีการเปลี่ยนไปใช้หน้าเว็บจริง (Production Mode)
+Users do not need to install Python, PyQt6, Playwright, or Chromium separately.
 
-เมื่อคุณต้องการนำไปใช้งานจริงกับระบบทะเบียนของมหาวิทยาลัยมหาสารคาม ให้ทำตามขั้นตอนดังนี้:
+Runtime user data is created per machine at:
 
-1. เปิดไฟล์ [config.py](file:///E:/projects/msureghelpper/config.py)
-2. แก้ไขตัวแปร `MODE` ในบรรทัดที่ 11:
-   ```python
-   # เปลี่ยนจาก "demo" เป็น "production"
-   MODE = "production"
-   ```
-3. บันทึกไฟล์และเปิดโปรแกรม `python main.py` ใหม่อีกครั้ง
-4. เมื่อกด **"เปิด Browser"** ระบบจะพาคุณไปยังหน้าล็อกอินจริงของมหาวิทยาลัยโดยตรง (`https://reg.msu.ac.th/registrar/login.asp`)
-5. ให้เข้าสู่ระบบด้วยข้อมูลของคุณเอง เมื่อเข้าสู่ระบบสำเร็จแล้วโปรแกรมจะกรอกรหัสและดำเนินการให้แบบอัตโนมัติทันที
+```text
+%LOCALAPPDATA%\MSU Registration Helper
+```
 
----
+That folder stores the local SQLite database, browser profile, logs, and screenshots. Do not distribute your local `msu_profile`, `msu_helper.db`, `logs`, or `screenshots` folders.
 
-## 📃 สิทธิ์การใช้งาน (License)
+## Saved Course Profiles
 
-พัฒนาขึ้นเพื่อการศึกษา, ใช้เป็นเครื่องมือส่วนตัว และการนำเสนอ Portfolio เท่านั้น
-มหาวิทยาลัยมหาสารคาม (Mahasarakham University) เป็นเจ้าของเครื่องหมายการค้าและระบบทะเบียนจริง
-โปรเจกต์นี้ไม่ได้เกี่ยวข้องกับมหาวิทยาลัยอย่างเป็นทางการ
+Saved Course Profiles let you prepare course lists before registration day and load only enabled courses into the active registration queue when you are ready.
 
+### Before registration day
+
+1. Open the program.
+2. In **Saved Course Profiles**, click **Create**.
+3. Enter a profile name, for example `Term 2569/1`.
+4. Enter the academic term, for example `2569/1`.
+5. Click **Add Course** and enter course code, section/group, note, priority/order, and enabled/disabled status.
+6. Use **Edit**, **Remove**, **Enable/Disable**, **Up**, and **Down** to maintain the profile.
+7. Use **Export CSV** to back up the selected profile.
+8. Use **Import CSV** to create a profile from a CSV file.
+
+### On registration day
+
+1. Open the program.
+2. Click **Open Browser**.
+3. Log in manually in the browser.
+4. Select the saved profile, for example `Term 2569/1`.
+5. Click **Load to Queue**.
+6. Adjust **Retry count** and **Retry delay seconds** if needed.
+7. Click **Register All Enabled / Queued**.
+8. The program processes courses one by one, waits after each course, updates the queue status, and records each result into History.
+
+## Database Tables
+
+`course_profiles`
+
+- `id`
+- `name`
+- `academic_term`
+- `created_at`
+- `updated_at`
+
+`saved_courses`
+
+- `id`
+- `profile_id`
+- `course_code`
+- `section`
+- `note`
+- `priority`
+- `enabled`
+- `created_at`
+
+The app also keeps the existing current queue in `courses` and registration results in `history`.
+
+## Result History
+
+Per-course history supports:
+
+- `pending`
+- `success`
+- `full`
+- `conflict`
+- `invalid`
+- `failed`
+- `skipped`
+
+Open **History** to review results or click **Export History CSV** to export the registration result history.
+
+## CSV Profile Format
+
+```csv
+profile_name,academic_term,course_code,section,note,priority,enabled
+Term 2569/1,2569/1,0041001,1,Main choice,1,1
+Term 2569/1,2569/1,0041002,2,Backup section,2,0
+```
+
+## Safety Notes
+
+- The user logs in manually through the browser.
+- The app does not collect or store passwords.
+- Retry delay should stay at 5 seconds or more to avoid request spam.
+- Use this as a personal helper and verify final results on the official registration website.
+
+## License
+
+Educational/personal portfolio project. Mahasarakham University and its registration system remain the property of their respective owners.

@@ -1,189 +1,185 @@
-"""
-MSU Registration Helper — Stylesheet
-รวบรวมสไตล์ชีต QSS สไตล์ Dark Mode ทันสมัยและหรูหรา
-"""
+"""Application stylesheet."""
 
 DARK_THEME_QSS = """
-/* ---------- Main Window Base ---------- */
 QMainWindow {
-    background-color: #0d1117;
+    background-color: #0f141b;
 }
 
 QWidget {
-    color: #e6edf3;
-    font-family: 'Segoe UI', 'Leelawadee UI', 'Tahoma', sans-serif;
-    font-size: 13px;
+    color: #eef3f8;
+    font-family: 'Leelawadee UI', 'Tahoma', 'Segoe UI', sans-serif;
+    font-size: 14px;
 }
 
-/* ---------- Group Box / Section Containers ---------- */
 QGroupBox {
-    background-color: #161b22;
-    border: 1px solid #30363d;
+    background-color: #171d25;
+    border: 1px solid #2f3946;
     border-radius: 8px;
-    margin-top: 15px;
-    padding-top: 18px;
+    margin-top: 18px;
+    padding: 16px 12px 12px 12px;
     font-weight: bold;
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    left: 12px;
-    padding: 0 5px;
-    color: #58a6ff;
+    left: 14px;
+    padding: 0 8px;
+    color: #7cc7ff;
+    background-color: #0f141b;
 }
 
-/* ---------- Text Inputs ---------- */
-QLineEdit {
-    background-color: #21262d;
-    border: 1px solid #30363d;
+QLabel#hintText {
+    color: #9aa7b5;
+    font-size: 12px;
+}
+
+QLineEdit, QComboBox, QSpinBox {
+    background-color: #222a34;
+    border: 1px solid #364252;
     border-radius: 6px;
-    padding: 8px 12px;
-    color: #e6edf3;
-    selection-background-color: #1f6feb;
+    min-height: 22px;
+    padding: 7px 10px;
+    color: #f5f8fb;
+    selection-background-color: #2d7dd2;
 }
 
-QLineEdit:focus {
-    border: 1px solid #58a6ff;
-    background-color: #262c36;
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus {
+    border: 1px solid #7cc7ff;
+    background-color: #27313d;
 }
 
-QLineEdit:disabled {
-    background-color: #0d1117;
-    color: #8b949e;
-    border: 1px solid #21262d;
+QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled {
+    background-color: #151a21;
+    color: #7a8794;
+    border: 1px solid #27313d;
 }
 
-/* ---------- Buttons ---------- */
+QComboBox::drop-down {
+    border: none;
+    width: 24px;
+}
+
 QPushButton {
-    background-color: #21262d;
-    border: 1px solid #30363d;
+    background-color: #24303c;
+    border: 1px solid #3a4655;
     border-radius: 6px;
-    padding: 8px 16px;
-    color: #c9d1d9;
+    min-height: 22px;
+    padding: 7px 14px;
+    color: #eef3f8;
     font-weight: bold;
 }
 
 QPushButton:hover {
-    background-color: #30363d;
-    border-color: #8b949e;
+    background-color: #2d3948;
+    border-color: #6f8195;
 }
 
 QPushButton:pressed {
-    background-color: #161b22;
+    background-color: #1d2630;
 }
 
 QPushButton:disabled {
-    background-color: #21262d;
-    color: #484f58;
-    border-color: #21262d;
+    background-color: #1a2028;
+    color: #596574;
+    border-color: #242b34;
 }
 
-/* Primary Green Button (เช่น ยืนยัน) */
 QPushButton#primaryButton {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2ea043, stop:1 #238636);
-    border: 1px solid #3fb950;
+    background-color: #248a3d;
+    border: 1px solid #38b558;
     color: #ffffff;
 }
 
 QPushButton#primaryButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3fb950, stop:1 #2ea043);
-    border-color: #58a6ff;
+    background-color: #2fa64a;
 }
 
 QPushButton#primaryButton:pressed {
-    background-color: #238636;
+    background-color: #1d7132;
 }
 
 QPushButton#primaryButton:disabled {
-    background: #102a15;
-    color: #2d5a31;
-    border-color: #102a15;
+    background-color: #17301d;
+    color: #56825f;
+    border-color: #1f3b25;
 }
 
-/* Accent Blue Button (เช่น เปิด Browser, ค้นหา) */
 QPushButton#accentButton {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #388bfd, stop:1 #1f6feb);
-    border: 1px solid #58a6ff;
+    background-color: #2374d8;
+    border: 1px solid #58a9ff;
     color: #ffffff;
 }
 
 QPushButton#accentButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #58a6ff, stop:1 #388bfd);
-    border-color: #c9d1d9;
+    background-color: #348bf0;
 }
 
 QPushButton#accentButton:pressed {
-    background-color: #1f6feb;
+    background-color: #1b5eb3;
 }
 
-/* Danger Button (ปุ่ม ลบ หรือ ยกเลิก) */
 QPushButton#dangerButton {
-    background-color: #da3633;
-    border: 1px solid #f85149;
+    background-color: #8f2f2f;
+    border: 1px solid #d95555;
     color: #ffffff;
 }
 
 QPushButton#dangerButton:hover {
-    background-color: #f85149;
+    background-color: #b53f3f;
 }
 
 QPushButton#dangerButton:pressed {
-    background-color: #b62320;
+    background-color: #742727;
 }
 
-/* ---------- Table Widget ---------- */
 QTableWidget {
-    background-color: #161b22;
-    border: 1px solid #30363d;
+    background-color: #121821;
+    border: 1px solid #2f3946;
     border-radius: 6px;
-    gridline-color: #30363d;
-    selection-background-color: #1f6feb;
+    gridline-color: #28313d;
+    selection-background-color: #264f78;
     selection-color: #ffffff;
+    alternate-background-color: #171f2a;
 }
 
 QTableWidget::item {
-    padding: 6px;
-}
-
-QTableWidget::item:alternate {
-    background-color: #1f242c;
+    padding: 7px;
 }
 
 QHeaderView::section {
-    background-color: #21262d;
-    color: #8b949e;
-    padding: 6px;
-    border: 1px solid #30363d;
+    background-color: #222a34;
+    color: #b8c3cf;
+    padding: 8px;
+    border: 1px solid #303946;
     font-weight: bold;
 }
 
-/* ---------- Text Edit (Log Window) ---------- */
 QTextEdit {
-    background-color: #090c10;
-    border: 1px solid #30363d;
+    background-color: #0b1016;
+    border: 1px solid #2f3946;
     border-radius: 6px;
-    font-family: 'Consolas', 'Courier New', monospace;
+    font-family: 'Leelawadee UI', 'Tahoma', 'Segoe UI', sans-serif;
+    font-size: 12px;
     padding: 8px;
-    color: #c9d1d9;
+    color: #d9e2ec;
 }
 
-/* ---------- Scrollbars ---------- */
 QScrollBar:vertical {
     border: none;
-    background: #0d1117;
+    background: #10161d;
     width: 8px;
     margin: 0px 0 0px 0;
 }
 
 QScrollBar::handle:vertical {
-    background: #30363d;
+    background: #3a4655;
     min-height: 20px;
     border-radius: 4px;
 }
 
 QScrollBar::handle:vertical:hover {
-    background: #8b949e;
+    background: #738397;
 }
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
@@ -191,49 +187,47 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     background: none;
 }
 
-/* ---------- Dialogs ---------- */
 QDialog {
-    background-color: #0d1117;
+    background-color: #0f141b;
 }
 
-/* ---------- Status indicator styles ---------- */
 QLabel#statusBadgePending {
-    background-color: #1f2b3d;
-    color: #58a6ff;
-    border-radius: 10px;
-    padding: 2px 8px;
+    background-color: #17334f;
+    color: #86c8ff;
+    border-radius: 9px;
+    padding: 3px 8px;
     font-weight: bold;
 }
 
 QLabel#statusBadgeSuccess {
-    background-color: #132b1a;
-    color: #3fb950;
-    border-radius: 10px;
-    padding: 2px 8px;
+    background-color: #17351f;
+    color: #6fdd87;
+    border-radius: 9px;
+    padding: 3px 8px;
     font-weight: bold;
 }
 
 QLabel#statusBadgeFull {
-    background-color: #331518;
-    color: #f85149;
-    border-radius: 10px;
-    padding: 2px 8px;
+    background-color: #451d20;
+    color: #ff8585;
+    border-radius: 9px;
+    padding: 3px 8px;
     font-weight: bold;
 }
 
 QLabel#statusBadgeConflict {
-    background-color: #2c210f;
-    color: #d29922;
-    border-radius: 10px;
-    padding: 2px 8px;
+    background-color: #3b2b12;
+    color: #f2c35b;
+    border-radius: 9px;
+    padding: 3px 8px;
     font-weight: bold;
 }
 
 QLabel#statusBadgeNotFound {
-    background-color: #21262d;
-    color: #8b949e;
-    border-radius: 10px;
-    padding: 2px 8px;
+    background-color: #252d37;
+    color: #b4beca;
+    border-radius: 9px;
+    padding: 3px 8px;
     font-weight: bold;
 }
 """

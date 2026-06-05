@@ -5,7 +5,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QFont, QIcon
 from gui.app import MainWindow
 from database.db import DatabaseManager
 import config
@@ -17,6 +17,7 @@ def main():
     # 2. เริ่มแอป Qt
     app = QApplication(sys.argv)
     app.setApplicationName(config.APP_NAME)
+    app.setFont(QFont("Leelawadee UI", 10))
     app.setStyle('Fusion')  # ฟิวชันเพื่อให้สไตล์ Dark ทำงานได้ราบรื่นทุกระบบปฏิบัติการ
     
     # 3. โหลด/เปิดหน้าต่างหลัก

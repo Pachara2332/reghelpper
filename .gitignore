@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+
+build/
+dist/
+release/
+
+logs/
+screenshots/
+msu_helper.db
+msu_profile/
