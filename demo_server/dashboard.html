@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>หน้าหลัก — ระบบทะเบียน MSU (Demo)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="dashboard.html" class="brand">
+      <div class="logo-icon">M</div>
+      <span>ระบบทะเบียน MSU (Demo)</span>
+    </a>
+    <div class="nav-right">
+      <span class="student-id" id="student-id-display">รหัสนิสิต: 66011234567</span>
+      <button id="logout-btn" class="btn btn-secondary btn-sm">🚪 ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <!-- Container -->
+  <div class="container fade-in">
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <h2 id="welcome-message">สวัสดีครับ คุณนิสิต</h2>
+      <p>ยินดีต้อนรับเข้าสู่ระบบทะเบียนและประมวลผลการศึกษา มหาวิทยาลัยมหาสารคาม</p>
+      <div class="mt-2">
+        <span class="semester-info">ภาคเรียนที่ 1/2568</span>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <h3 class="section-title">เมนูการใช้งานหลัก</h3>
+    <div class="quick-links">
+      <a href="register.html" id="nav-register" class="quick-link-card">
+        <div class="icon">📝</div>
+        <div class="label">ลงทะเบียนเรียน</div>
+      </a>
+      <div class="quick-link-card" style="cursor: default;">
+        <div class="icon">📊</div>
+        <div class="label">ผลการเรียน (GPA)</div>
+      </div>
+      <div class="quick-link-card" style="cursor: default;">
+        <div class="icon">📅</div>
+        <div class="label">ปฏิทินการศึกษา</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-note mt-3">
+    <span class="badge">DEMO</span>
+    ระบบนี้เป็น Demo สำหรับทดสอบ
+  </div>
+
+  <script>
+    // ตรวจสอบ session
+    (function checkSession() {
+      var username = sessionStorage.getItem('msu_username');
+      if (!username) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('student-id-display').textContent = 'รหัสนิสิต: ' + username;
+      document.getElementById('welcome-message').textContent = 'สวัสดีครับ รหัสนิสิต ' + username;
+    })();
+
+    // จัดการปุ่ม Logout
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

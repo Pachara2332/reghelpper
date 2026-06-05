@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ผลการลงทะเบียนเรียน — ระบบทะเบียน MSU (Demo)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="dashboard.html" class="brand">
+      <div class="logo-icon">M</div>
+      <span>ระบบทะเบียน MSU (Demo)</span>
+    </a>
+    <div class="nav-right">
+      <span class="student-id" id="student-id-display">รหัสนิสิต: 66011234567</span>
+      <button id="logout-btn" class="btn btn-secondary btn-sm">🚪 ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <!-- Container -->
+  <div class="container fade-in">
+    <div class="card">
+      <div class="result-summary">
+        <div class="check-icon">✓</div>
+        <h2>บันทึกผลการลงทะเบียนเรียนสำเร็จ</h2>
+        <p>กรุณาตรวจสอบผลการลงทะเบียนของท่านในรายการด้านล่างนี้</p>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>รหัสวิชา</th>
+              <th>ชื่อวิชา</th>
+              <th>หมู่เรียน</th>
+              <th>สถานะผลลัพธ์</th>
+            </tr>
+          </thead>
+          <tbody id="result-table-body">
+            <!-- ข้อมูลจะถูกเขียนด้วย JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="result-actions">
+        <a href="dashboard.html" class="btn btn-primary">
+          🏠 กลับหน้าหลัก
+        </a>
+        <a href="register.html" class="btn btn-outline">
+          📝 ลงทะเบียนเพิ่มเติม
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-note mt-3">
+    <span class="badge">DEMO</span>
+    ระบบนี้เป็น Demo สำหรับทดสอบ
+  </div>
+
+  <script>
+    // ตรวจสอบ session
+    (function checkSession() {
+      var username = sessionStorage.getItem('msu_username');
+      if (!username) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('student-id-display').textContent = 'รหัสนิสิต: ' + username;
+    })();
+
+    // แสดงรายการผลลัพธ์จาก sessionStorage
+    (function loadResults() {
+      const tbody = document.getElementById('result-table-body');
+      tbody.innerHTML = '';
+
+      let addedCourses = [];
+      try {
+        const saved = sessionStorage.getItem('msu_added_courses');
+        if (saved) {
+          addedCourses = JSON.parse(saved);
+        }
+      } catch(e) {
+        addedCourses = [];
+      }
+
+      if (addedCourses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center" style="color: var(--gray);">ไม่พบประวัติผลการลงทะเบียนเรียน</td></tr>';
+        return;
+      }
+
+      addedCourses.forEach(course => {
+        let statusBadge = '';
+        if (course.status === 'success') {
+          statusBadge = '<span class="status-badge status-success">ลงทะเบียนสำเร็จ</span>';
+        } else if (course.status === 'full') {
+          statusBadge = '<span class="status-badge status-full">ที่นั่งเต็ม</span>';
+        } else if (course.status === 'conflict') {
+          statusBadge = '<span class="status-badge status-conflict">เวลาเรียนชนกัน</span>';
+        } else if (course.status === 'not_found') {
+          statusBadge = '<span class="status-badge status-not_found">ไม่พบรายวิชา</span>';
+        } else {
+          statusBadge = `<span class="status-badge status-pending">${course.status}</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${course.code}</td>
+          <td>${course.name}</td>
+          <td>${course.section}</td>
+          <td>${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    })();
+
+    // จัดการปุ่ม Logout
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

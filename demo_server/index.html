@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบทะเบียน MSU (Demo)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card fade-in">
+      <!-- โลโก้และชื่อระบบ -->
+      <div class="logo-area">
+        <div class="logo-circle">MSU</div>
+        <h1>ระบบทะเบียน MSU</h1>
+        <p>มหาวิทยาลัยมหาสารคาม — ระบบลงทะเบียนเรียน</p>
+      </div>
+
+      <!-- ฟอร์มเข้าสู่ระบบ -->
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="username">รหัสนิสิต</label>
+          <input
+            id="username"
+            type="text"
+            placeholder="รหัสนิสิต เช่น 66011234567"
+            required
+            autofocus
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password">รหัสผ่าน</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="รหัสผ่าน"
+            required
+          >
+        </div>
+
+        <button id="login-btn" type="submit" class="btn btn-primary btn-block">
+          🔐 เข้าสู่ระบบ
+        </button>
+      </form>
+
+      <!-- หมายเหตุ -->
+      <div class="demo-note mt-3">
+        <span class="badge">DEMO</span>
+        ระบบนี้เป็น Demo สำหรับทดสอบ
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================
+       Login Page - JavaScript
+       รับ username/password ใดก็ได้ แล้ว redirect
+       ============================================ */
+
+    // ถ้าล็อกอินแล้ว ให้ไปหน้า dashboard เลย
+    (function checkExistingSession() {
+      if (sessionStorage.getItem('msu_username')) {
+        window.location.href = 'dashboard.html';
+      }
+    })();
+
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      var username = document.getElementById('username').value.trim();
+      var password = document.getElementById('password').value.trim();
+
+      // ตรวจสอบว่ากรอกข้อมูลครบ
+      if (!username || !password) {
+        return;
+      }
+
+      // เก็บข้อมูลลง sessionStorage (Demo: ไม่ตรวจสอบรหัสผ่านจริง)
+      sessionStorage.setItem('msu_username', username);
+      sessionStorage.setItem('msu_login_time', new Date().toISOString());
+
+      // ไปหน้า dashboard
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>

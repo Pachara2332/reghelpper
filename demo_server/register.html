@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ลงทะเบียนเรียน — ระบบทะเบียน MSU (Demo)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="dashboard.html" class="brand">
+      <div class="logo-icon">M</div>
+      <span>ระบบทะเบียน MSU (Demo)</span>
+    </a>
+    <div class="nav-right">
+      <span class="student-id" id="student-id-display">รหัสนิสิต: 66011234567</span>
+      <button id="logout-btn" class="btn btn-secondary btn-sm">🚪 ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <!-- Container -->
+  <div class="container fade-in">
+    <div class="card">
+      <h3 class="card-title">📝 เพิ่มรายวิชาลงทะเบียน</h3>
+      
+      <!-- ฟอร์มลงทะเบียน -->
+      <form id="reg-form-el" class="reg-form" autocomplete="off">
+        <div class="form-group">
+          <label for="courseCode">รหัสวิชา</label>
+          <input
+            id="courseCode"
+            type="text"
+            placeholder="เช่น 0041001"
+            required
+            autofocus
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="section">หมู่เรียน (Sec)</label>
+          <input
+            id="section"
+            type="number"
+            placeholder="เช่น 1"
+            required
+          >
+        </div>
+
+        <button id="add-btn" type="submit" class="btn btn-primary">
+          ➕ เพิ่มรายวิชา
+        </button>
+      </form>
+
+      <!-- ข้อความแจ้งสถานะ -->
+      <div id="status-message"></div>
+    </div>
+
+    <!-- ตารางแสดงรายการวิชาที่เลือกไว้ -->
+    <div class="card">
+      <h3 class="card-title">📋 รายการวิชาที่เลือก (รอยืนยัน)</h3>
+      
+      <div class="table-wrapper">
+        <table id="course-table">
+          <thead>
+            <tr>
+              <th>รหัสวิชา</th>
+              <th>ชื่อวิชา</th>
+              <th>หมู่เรียน</th>
+              <th>สถานะ</th>
+              <th style="text-align: center;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="course-table-body">
+            <!-- ข้อมูลจะถูกเขียนด้วย JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-3 text-center">
+        <button id="confirm-btn" class="btn btn-secondary" style="font-size: 1.1rem; width: 250px;" disabled>
+          ✔️ ยืนยันการลงทะเบียน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-note mt-3">
+    <span class="badge">DEMO</span>
+    ระบบนี้เป็น Demo สำหรับทดสอบ
+  </div>
+
+  <script>
+    // Mock Courses Data
+    const MOCK_COURSES = {
+      '0041001': { name: 'ภาษาอังกฤษพื้นฐาน', maxSeats: 45 },
+      '1201203': { name: 'โครงสร้างข้อมูล', maxSeats: 40 },
+      '8881001': { name: 'กิจกรรมเสริมหลักสูตร 1', maxSeats: 60 },
+      '1201101': { name: 'การเขียนโปรแกรมคอมพิวเตอร์', maxSeats: 40 },
+      '1201204': { name: 'ระบบปฏิบัติการ', maxSeats: 35 },
+    };
+
+    // โหลดวิชาที่เคยเพิ่มไว้ในคราวนี้ (ใช้ sessionStorage สำหรับจำค่า)
+    let addedCourses = [];
+    try {
+      const saved = sessionStorage.getItem('msu_added_courses');
+      if (saved) {
+        addedCourses = JSON.parse(saved);
+      }
+    } catch(e) {
+      addedCourses = [];
+    }
+
+    // ตรวจสอบ session
+    (function checkSession() {
+      var username = sessionStorage.getItem('msu_username');
+      if (!username) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('student-id-display').textContent = 'รหัสนิสิต: ' + username;
+    })();
+
+    // อัปเดตตารางและปุ่มยืนยัน
+    function updateUI() {
+      const tbody = document.getElementById('course-table-body');
+      tbody.innerHTML = '';
+
+      if (addedCourses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="color: var(--gray);">ยังไม่มีรายวิชาที่เลือก</td></tr>';
+        document.getElementById('confirm-btn').disabled = true;
+        return;
+      }
+
+      let hasPending = false;
+
+      addedCourses.forEach((course, index) => {
+        let statusBadge = '';
+        if (course.status === 'pending') {
+          statusBadge = '<span class="status-badge status-pending">รอยืนยัน</span>';
+          hasPending = true;
+        } else if (course.status === 'full') {
+          statusBadge = '<span class="status-badge status-full">ที่นั่งเต็ม</span>';
+        } else if (course.status === 'conflict') {
+          statusBadge = '<span class="status-badge status-conflict">เวลาเรียนชนกัน</span>';
+        } else if (course.status === 'not_found') {
+          statusBadge = '<span class="status-badge status-not_found">ไม่พบรายวิชา</span>';
+        } else {
+          statusBadge = `<span class="status-badge status-success">${course.status}</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${course.code}</td>
+          <td>${course.name}</td>
+          <td>${course.section}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: center;">
+            <button class="btn btn-danger btn-sm" onclick="removeCourse(${index})">ลบ</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('confirm-btn').disabled = !hasPending;
+      sessionStorage.setItem('msu_added_courses', JSON.stringify(addedCourses));
+    }
+
+    // ลบวิชา
+    window.removeCourse = function(index) {
+      addedCourses.splice(index, 1);
+      updateUI();
+    };
+
+    // ฟังก์ชันแสดงข้อความแจ้งเตือน
+    function showStatus(text, type) {
+      const msgDiv = document.getElementById('status-message');
+      msgDiv.className = '';
+      msgDiv.classList.add('show');
+      
+      if (type === 'success') msgDiv.classList.add('msg-success');
+      else if (type === 'error') msgDiv.classList.add('msg-error');
+      else if (type === 'warning') msgDiv.classList.add('msg-warning');
+      else msgDiv.classList.add('msg-info');
+
+      msgDiv.textContent = text;
+    }
+
+    // เพิ่มรายวิชา
+    document.getElementById('reg-form-el').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const courseCode = document.getElementById('courseCode').value.trim();
+      const section = document.getElementById('section').value.trim();
+
+      if (!courseCode || !section) return;
+
+      // ตรวจสอบวิชาซ้ำ
+      const isDuplicate = addedCourses.some(c => c.code === courseCode && c.section === section);
+      if (isDuplicate) {
+        showStatus(`รหัสวิชา ${courseCode} หมู่เรียน ${section} ถูกเพิ่มในตารางแล้ว`, 'error');
+        return;
+      }
+
+      let name = '';
+      let status = '';
+      let msg = '';
+      let msgType = '';
+
+      // ค้นหาวิชาใน mock data
+      const mockCourse = MOCK_COURSES[courseCode];
+      
+      if (!mockCourse) {
+        name = 'ไม่ระบุ';
+        status = 'not_found';
+        msg = `ไม่พบรหัสวิชา ${courseCode} ในระบบ`;
+        msgType = 'error';
+      } else if (courseCode === '8881001' && section === '3') {
+        name = mockCourse.name;
+        status = 'conflict';
+        msg = `วิชา ${courseCode} Sec ${section} เวลาเรียนชนกับวิชาอื่น`;
+        msgType = 'warning';
+      } else {
+        name = mockCourse.name;
+        // สุ่มที่นั่งเต็ม 30% และสำเร็จ (รอยืนยัน) 70%
+        const roll = Math.random();
+        if (roll < 0.3) {
+          status = 'full';
+          msg = `วิชา ${courseCode} Sec ${section} ที่นั่งเต็มแล้ว`;
+          msgType = 'error';
+        } else {
+          status = 'pending';
+          msg = `เพิ่มวิชา ${courseCode} Sec ${section} สำเร็จ (สถานะ: รอยืนยัน)`;
+          msgType = 'success';
+        }
+      }
+
+      // เพิ่มลงรายการ
+      addedCourses.push({
+        code: courseCode,
+        name: name,
+        section: section,
+        status: status
+      });
+
+      // แสดงข้อความสถานะ
+      showStatus(msg, msgType);
+      
+      // ล้างค่าในช่องกรอก
+      document.getElementById('courseCode').value = '';
+      document.getElementById('section').value = '';
+      document.getElementById('courseCode').focus();
+
+      // อัปเดต UI
+      updateUI();
+    });
+
+    // ยืนยันการลงทะเบียน
+    document.getElementById('confirm-btn').addEventListener('click', function() {
+      // ค้นหารายการที่เป็น pending แล้วเปลี่ยนเป็นสำเร็จ
+      let confirmedCount = 0;
+      addedCourses = addedCourses.map(c => {
+        if (c.status === 'pending') {
+          confirmedCount++;
+          return { ...c, status: 'success' };
+        }
+        return c;
+      });
+
+      sessionStorage.setItem('msu_added_courses', JSON.stringify(addedCourses));
+
+      // ไปหน้าแสดงผลลัพธ์
+      window.location.href = 'result.html';
+    });
+
+    // จัดการปุ่ม Logout
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      sessionStorage.clear();
+      window.location.href = 'index.html';
+    });
+
+    // แสดงข้อมูลครั้งแรก
+    updateUI();
+  </script>
+</body>
+</html>
